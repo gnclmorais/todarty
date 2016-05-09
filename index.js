@@ -2,6 +2,7 @@ var _ = require('lodash');
 var Promise = require('bluebird');
 var nytTop = require('nyt-top');
 require('dotenv').config();
+var lwip = require('lwip');
 
 nytTop.key(process.env.NYT_KEY);
 
@@ -19,6 +20,10 @@ nytTop.section('world', function (err, data) {
         console.log(
           (item.image ? '(img) ' : '      ') +
           (index+1) + '. ' + item.title
+        );
+        console.log(
+          '      ' +
+          item.image
         );
       });
   }
