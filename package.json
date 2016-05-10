@@ -15,9 +15,11 @@
   "dependencies": {
     "bluebird": "^3.3.5",
     "dotenv": "^2.0.0",
+    "http-request": "^0.7.0",
     "lodash": "^4.12.0",
     "lwip": "0.0.8",
     "nyt-top": "^1.0.5",
+    "request": "^2.72.0",
     "sentiment": "^1.0.6"
   }
 }

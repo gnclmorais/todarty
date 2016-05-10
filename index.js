@@ -1,4 +1,8 @@
 var _ = require('lodash');
+var fs = require('fs');
+var path = require('path');
+var request = require('request').defaults({ encoding: null });
+var http = require('http-request');
 var Promise = require('bluebird');
 var nytTop = require('nyt-top');
 require('dotenv').config();
@@ -29,11 +33,16 @@ nytTop.section('world', function (err, data) {
         );
       });
 
-    var width = height = 1000;
+    var width = height = 2100;
     lwip.create(width, height, 'magenta', function (err, output) {
-      lwip.open(_(news).first().image, function (err, img) {
-        output.batch().paste(0, 0, img).exec(function () {
-          output.writeFile('output.jpg', function (err) {
+      downloadFile(_(news).first().image, function (name) {
+        lwip.open('./' + name, function (err, img) {
+          if (err) { console.log('Err:', err); }
+
+          output.batch().paste(0, 0, img).exec(function () {
+            output.writeFile('output.jpg', function (aa) {
+              console.log(aa);
+            });
           });
         });
       });
@@ -52,6 +61,28 @@ nytTop.section('world', function (err, data) {
     });
   }
 });
+
+function downloadFile(url, callback) {
+  var name = path.basename(url);
+  var file = fs.createWriteStream(name);
+  request(url)
+    .pipe(file)
+    .on('finish', function () {
+      callback(name);
+    });
+}
+
+function downloadImage(url, callback) {
+  http.get(url, function (err, res) {
+    console.log(res.headers);
+    callback(res.buffer);
+  });
+  // request(url, function (err, response, buffer) {
+  //   if (!err && response.statusCode == 200) {
+  //     callback(buffer);
+  //   }
+  // });
+}
 
 // [x] Get top news
 // [x] Get images of top news

@@ -7,3 +7,4 @@ Art generation with today’s news.
 - Proportional according to feeling
 - Get the image size according to the feeling
 - Get main palette of image
+- Promisify stuff
