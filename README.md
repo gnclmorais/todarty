@@ -8,3 +8,5 @@ Art generation with today’s news.
 - Get the image size according to the feeling
 - Get main palette of image
 - Promisify stuff
+- Filters
+  - http://camanjs.com

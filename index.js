@@ -36,14 +36,20 @@ nytTop.section('world', function (err, data) {
     var width = height = 2100;
     lwip.create(width, height, 'magenta', function (err, output) {
       downloadFile(_(news).first().image, function (name) {
-        lwip.open('./' + name, function (err, img) {
+        lwip.open('./tmp/' + name, function (err, img) {
           if (err) { console.log('Err:', err); }
 
-          output.batch().paste(0, 0, img).exec(function () {
-            output.writeFile('output.jpg', function (aa) {
-              console.log(aa);
+          var width  = img.width();
+          var height = img.height();
+
+          output
+            .batch()
+            .paste(0, 0, img)
+            .exec(function () {
+              output.writeFile('output.jpg', function () {
+                console.log('Done!');
+              });
             });
-          });
         });
       });
 
@@ -62,9 +68,17 @@ nytTop.section('world', function (err, data) {
   }
 });
 
+function tilt() {
+  return Math.random() * 45 * plusOrMinus();
+}
+
+function plusOrMinus() {
+  return Math.round(Math.random()) * 2 - 1;
+}
+
 function downloadFile(url, callback) {
   var name = path.basename(url);
-  var file = fs.createWriteStream(name);
+  var file = fs.createWriteStream('./tmp/' + name);
   request(url)
     .pipe(file)
     .on('finish', function () {
