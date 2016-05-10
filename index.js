@@ -11,12 +11,12 @@ nytTop.section('world', function (err, data) {
   if (err) {
     console.log(err);
   } else {
-    _(data.results)
+    var news = _(data.results)
       .map(condenseNews)
       .filter(function (news) {
         return !!news.image;
       })
-      .take(10)
+      .take(9)
       .forEach(function (item, index) {
         console.log(
           (item.image ? '(img) ' : '      ') +
@@ -28,12 +28,36 @@ nytTop.section('world', function (err, data) {
           item.image
         );
       });
+
+    var width = height = 1000;
+    lwip.create(width, height, 'magenta', function (err, output) {
+      lwip.open(_(news).first().image, function (err, img) {
+        output.batch().paste(0, 0, img).exec(function () {
+          output.writeFile('output.jpg', function (err) {
+          });
+        });
+      });
+
+
+
+
+      // news.forEach(function (news) {
+      //   lwip.open(news.image, function (err, img) {
+      //     output.paste(0, 0, img);
+      //   });
+      // });
+
+      // output.writeFile('output.jpg', function (err) {
+      // });
+    });
   }
 });
 
 // [x] Get top news
 // [x] Get images of top news
-// [ ]
+// [x] News sentiment
+// [ ] Save image
+// [ ] Resize image according to sentiment
 
 function condenseNews(news) {
   return {
