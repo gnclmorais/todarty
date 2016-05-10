@@ -3,6 +3,7 @@ var Promise = require('bluebird');
 var nytTop = require('nyt-top');
 require('dotenv').config();
 var lwip = require('lwip');
+var sentiment = require('sentiment');
 
 nytTop.key(process.env.NYT_KEY);
 
@@ -19,7 +20,8 @@ nytTop.section('world', function (err, data) {
       .forEach(function (item, index) {
         console.log(
           (item.image ? '(img) ' : '      ') +
-          (index+1) + '. ' + item.title
+          (index+1) + '. ' + item.title +
+          ': ' + sentiment(item.abstract).score
         );
         console.log(
           '      ' +
@@ -29,8 +31,9 @@ nytTop.section('world', function (err, data) {
   }
 });
 
-// - Get top news
-// - Get images of top news
+// [x] Get top news
+// [x] Get images of top news
+// [ ]
 
 function condenseNews(news) {
   return {
