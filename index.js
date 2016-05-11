@@ -11,62 +11,16 @@ var sentiment = require('sentiment');
 
 nytTop.key(process.env.NYT_KEY);
 
-nytTop.section('world', function (err, data) {
-  if (err) {
-    console.log(err);
-  } else {
-    var news = _(data.results)
-      .map(condenseNews)
-      .filter(function (news) {
-        return !!news.image;
-      })
-      .take(9)
-      .forEach(function (item, index) {
-        console.log(
-          (item.image ? '(img) ' : '      ') +
-          (index+1) + '. ' + item.title +
-          ': ' + sentiment(item.abstract).score
-        );
-        console.log(
-          '      ' +
-          item.image
-        );
-      });
+getImages()
+  .then(analyseAndSortNews)
+  .then(doCollage)
+  .catch(function (err) {
+    console.log('Something was wrong:', err);
+  });
 
-    var width = height = 2100;
-    lwip.create(width, height, 'magenta', function (err, output) {
-      downloadFile(_(news).first().image, function (name) {
-        lwip.open('./tmp/' + name, function (err, img) {
-          if (err) { console.log('Err:', err); }
-
-          var width  = img.width();
-          var height = img.height();
-
-          output
-            .batch()
-            .paste(0, 0, img)
-            .exec(function () {
-              output.writeFile('output.jpg', function () {
-                console.log('Done!');
-              });
-            });
-        });
-      });
-
-
-
-
-      // news.forEach(function (news) {
-      //   lwip.open(news.image, function (err, img) {
-      //     output.paste(0, 0, img);
-      //   });
-      // });
-
-      // output.writeFile('output.jpg', function (err) {
-      // });
-    });
-  }
-});
+/**
+ *
+ */
 
 function tilt() {
   return Math.random() * 45 * plusOrMinus();
@@ -76,15 +30,30 @@ function plusOrMinus() {
   return Math.round(Math.random()) * 2 - 1;
 }
 
-function downloadFile(url, callback) {
-  var name = path.basename(url);
-  var file = fs.createWriteStream('./tmp/' + name);
-  request(url)
-    .pipe(file)
-    .on('finish', function () {
-      callback(name);
-    });
+function downloadFile(url) {
+  return new Promise(function (resolve) {
+    var name = path.basename(url);
+    var dest = './tmp/' + name;
+    var file = fs.createWriteStream(dest);
+
+    request(url)
+      .pipe(file)
+      .on('finish', function () {
+        resolve(dest);
+      });
+  });
 }
+
+function openImage(dest) {
+  return new Promise(function (resolve, reject) {
+    lwip.open(dest, function (err, img) {
+      if (err) { reject(err); }
+
+      resolve(img);
+    });
+  });
+}
+
 
 function downloadImage(url, callback) {
   http.get(url, function (err, res) {
@@ -110,4 +79,111 @@ function condenseNews(news) {
     abstract: news.abstract,
     image: _.get(_.last(news.multimedia), 'url', null)
   };
+}
+
+
+/**
+ * New version
+ */
+
+/**
+ * Fetches images and returns only the necessary fields.
+ * @return {[type]} [description]
+ */
+function getImages() {
+  return new Promise(function (resolve, reject) {
+    nytTop.section('world', function (err, data) {
+      if (err) { reject(err); }
+
+      resolve(data.results);
+    });
+  });
+}
+
+/**
+ * Analyses the images received and sorts them accordingly.
+ */
+function analyseAndSortNews(news) {
+  return new Promise(function (resolve) {
+    resolve(
+      _(news)
+        .map(condenseNews)
+        .filter(function (news) {
+          return !!news.image;
+        })
+        .take(9)
+        .forEach(function (item, index) {
+          console.log(
+            (item.image ? '(img) ' : '      ') +
+            (index+1) + '. ' + item.title +
+            ': ' + sentiment(item.abstract).score
+          );
+          console.log(
+            '      ' +
+            item.image
+          );
+        })
+    );
+  });
+}
+
+/**
+ * Transforms an image and puts it on our canvas.
+ */
+function doCollage(news) {
+  return new Promise(function (resolve) {
+    var width = 2100;
+    var height =  width;
+
+    lwip.create(width, height, 'magenta', function (err, out) {
+      var batch = out.batch();
+      var first = _(news).first().image;
+
+      Promise.map(news, function (singleNews) {
+        return downloadFile(singleNews.image)
+          .then(openImage)
+          .then(function (img) {
+            batch.paste(0, 0, img);
+          });
+      }).then(function () {
+        batch.exec(function () {
+          out.writeFile('output.jpg', function () {});
+        });
+      });
+
+      // downloadFile(first)
+      //   .then(openImage)
+      //   .then(function (img) {
+      //     batch.paste(0, 0, img);
+      //   })
+      //   .then(function () {
+      //     batch.exec(function () {
+      //       out.writeFile('output.jpg', function () {});
+      //     });
+      //   });
+    });
+
+    resolve();
+  });
+
+  // var width = height = 2100;
+  // lwip.create(width, height, 'magenta', function (err, output) {
+  //   downloadFile(_(news).first().image, function (name) {
+  //     lwip.open('./tmp/' + name, function (err, img) {
+  //       if (err) { console.log('Err:', err); }
+
+  //       var width  = img.width();
+  //       var height = img.height();
+
+  //       output
+  //         .batch()
+  //         .paste(0, 0, img)
+  //         .exec(function () {
+  //           output.writeFile('output.jpg', function () {
+  //             console.log('Done!');
+  //           });
+  //         });
+  //     });
+  //   });
+  // });
 }
