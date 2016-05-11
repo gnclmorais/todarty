@@ -22,6 +22,10 @@ getImages()
  *
  */
 
+function pointInSpace(max) {
+  return Math.floor(Math.random() * max);
+}
+
 function tilt() {
   return Math.random() * 45 * plusOrMinus();
 }
@@ -115,7 +119,7 @@ function analyseAndSortNews(news) {
         .forEach(function (item, index) {
           console.log(
             (item.image ? '(img) ' : '      ') +
-            (index+1) + '. ' + item.title +
+            index + '. ' + item.title +
             ': ' + sentiment(item.abstract).score
           );
           console.log(
@@ -134,33 +138,45 @@ function doCollage(news) {
   return new Promise(function (resolve) {
     var width = 2100;
     var height =  width;
+    var frame = width / 3;
 
-    lwip.create(width, height, 'magenta', function (err, out) {
+    lwip.create(width, height, 'white', function (err, out) {
       var batch = out.batch();
-      var first = _(news).first().image;
 
-      Promise.map(news, function (singleNews) {
+      return Promise.map(news, function (singleNews, i) {
         return downloadFile(singleNews.image)
           .then(openImage)
           .then(function (img) {
-            batch.paste(0, 0, img);
+            return new Promise(function (resolve, reject) {
+              img.batch()
+                .cover(frame, frame)
+                //.rotate(tilt(), [255, 0, 0, 0])
+                //.fade(0.5)
+                .exec(function (err, imp) {
+                  if (err) { console.log('Err!', err); }
+
+                  console.log(
+                    'Writing ' + i + ' at ' +
+                    frame * Math.floor(i / 3),
+                    frame * (i % 3)
+                  );
+
+                  batch
+                    .paste(
+                      frame * Math.floor(i / 3),
+                      frame * (i % 3),
+                      imp
+                    );
+
+                  resolve(batch);
+                });
+              });
           });
       }).then(function () {
         batch.exec(function () {
           out.writeFile('output.jpg', function () {});
         });
       });
-
-      // downloadFile(first)
-      //   .then(openImage)
-      //   .then(function (img) {
-      //     batch.paste(0, 0, img);
-      //   })
-      //   .then(function () {
-      //     batch.exec(function () {
-      //       out.writeFile('output.jpg', function () {});
-      //     });
-      //   });
     });
 
     resolve();
