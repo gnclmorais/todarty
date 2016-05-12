@@ -10,3 +10,6 @@ Art generation with today’s news.
 - Promisify stuff
 - Filters
   - http://camanjs.com
+- Gradient with feeling colours
+- Soft landscapse
+  - https://twitter.com/softlandscapes

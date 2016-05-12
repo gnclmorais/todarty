@@ -58,6 +58,9 @@ function openImage(dest) {
   });
 }
 
+function sentimentScore(abstract) {
+  return sentiment(abstract).score;
+}
 
 function downloadImage(url, callback) {
   http.get(url, function (err, res) {
@@ -148,18 +151,15 @@ function doCollage(news) {
           .then(openImage)
           .then(function (img) {
             return new Promise(function (resolve, reject) {
+              var deltaFeeling = sentimentScore(singleNews.abstract);
+
               img.batch()
                 .cover(frame, frame)
-                //.rotate(tilt(), [255, 0, 0, 0])
-                //.fade(0.5)
+                .hue(deltaFeeling)
+                .saturate(deltaFeeling / 10)
+                .lighten(deltaFeeling / 10)
                 .exec(function (err, imp) {
-                  if (err) { console.log('Err!', err); }
-
-                  console.log(
-                    'Writing ' + i + ' at ' +
-                    frame * Math.floor(i / 3),
-                    frame * (i % 3)
-                  );
+                  if (err) { reject(err); }
 
                   batch
                     .paste(
