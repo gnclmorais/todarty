@@ -3,6 +3,7 @@ var fs = require('fs');
 var path = require('path');
 var request = require('request').defaults({ encoding: null });
 var http = require('http-request');
+var moment = require('moment');
 var Promise = require('bluebird');
 var nytTop = require('nyt-top');
 require('dotenv').config();
@@ -174,6 +175,9 @@ function doCollage(news) {
           });
       }).then(function () {
         batch.exec(function () {
+          var today = moment().format('dddd, MMMM Do YYYY, h:mma');
+
+          out.setMetadata(today);
           out.writeFile('output.jpg', function () {});
         });
       });
