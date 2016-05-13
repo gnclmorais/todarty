@@ -158,7 +158,6 @@ function doCollage(news) {
                 .cover(frame, frame)
                 .hue(deltaFeeling)
                 .saturate(deltaFeeling / 10)
-                .lighten(deltaFeeling / 10)
                 .exec(function (err, imp) {
                   if (err) { reject(err); }
 

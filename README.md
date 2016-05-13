@@ -1,6 +1,12 @@
 # todarty
 Art generation with today’s news.
 
+
+## To do
+- [ ] [Publish to Instagram](https://www.npmjs.com/package/instagram-node)
+- [ ] [Set up daily scheduler](https://devcenter.heroku.com/articles/scheduler)
+
+
 ## Ideas
 - Adapt colours based on feeling
 - Adapt image sizes according to its scores
@@ -13,6 +19,8 @@ Art generation with today’s news.
 - Gradient with feeling colours
 - Soft landscapse
   - https://twitter.com/softlandscapes
+- Apply orange/blue filters according to sentiment
+
 
 ## Typical news object from New York Times
 ```json
@@ -50,36 +58,7 @@ Art generation with today’s news.
       "caption": "Soldiers in Mexico transporting Joaquín Guzmán Loera, known as El Chapo, back to prison in January.",
       "copyright": "Rebecca Blackwell/Associated Press"
     },
-    {
-      "url": "https://static01.nyt.com/images/2016/05/10/world/10chapo-web/10chapo-web-thumbLarge.jpg",
-      "format": "thumbLarge",
-      "height": 150,
-      "width": 150,
-      "type": "image",
-      "subtype": "photo",
-      "caption": "Soldiers in Mexico transporting Joaquín Guzmán Loera, known as El Chapo, back to prison in January.",
-      "copyright": "Rebecca Blackwell/Associated Press"
-    },
-    {
-      "url": "https://static01.nyt.com/images/2016/05/10/world/10chapo-web/10chapo-web-articleInline.jpg",
-      "format": "Normal",
-      "height": 130,
-      "width": 190,
-      "type": "image",
-      "subtype": "photo",
-      "caption": "Soldiers in Mexico transporting Joaquín Guzmán Loera, known as El Chapo, back to prison in January.",
-      "copyright": "Rebecca Blackwell/Associated Press"
-    },
-    {
-      "url": "https://static01.nyt.com/images/2016/05/10/world/10chapo-web/10chapo-web-mediumThreeByTwo210.jpg",
-      "format": "mediumThreeByTwo210",
-      "height": 140,
-      "width": 210,
-      "type": "image",
-      "subtype": "photo",
-      "caption": "Soldiers in Mexico transporting Joaquín Guzmán Loera, known as El Chapo, back to prison in January.",
-      "copyright": "Rebecca Blackwell/Associated Press"
-    },
+    … // Images sorted by dimension
     {
       "url": "https://static01.nyt.com/images/2016/05/10/world/10chapo-web/10chapo-web-superJumbo.jpg",
       "format": "superJumbo",
